@@ -90,7 +90,6 @@
                         item.className = 'ruleta-seccion-item';
                         
                         let anguloCentro = (index * gradosPorItem) + (gradosPorItem / 2);
-                        // Radio ajustado al nuevo tamaño de la rueda de 400px (-120px del centro)
                         item.style.transform = `rotate(${anguloCentro}deg) translate(0, -120px) rotate(-${anguloCentro}deg)`;
                         
                         item.innerText = user;
