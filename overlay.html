@@ -32,7 +32,11 @@
         </div>
     </div>
 
-    <script>     
+    <script>
+        // Conexión WebSocket dinámica (funciona tanto en local como en Railway)
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}`);
+        
         // Paleta de colores vibrantes para las porciones
         const ioneColores = ['#ff3b5c', '#9146ff', '#008144', '#00aeef', '#f7931e', '#ec008c', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
 
@@ -53,7 +57,7 @@
             }
 
             contenedor.classList.add('visible');
-                        palabraBadge.innerHTML = `ESCRIBE EN EL CHAT: <span style="color: #FFFFff; font-weight: 3000;">"${data.palabraClave}"</span> PARA PARTICIPAR`;
+            palabraBadge.innerHTML = `ESCRIBE EN EL CHAT: <span style="color: #FFFFff; font-weight: 3000;">"${data.palabraClave}"</span> PARA PARTICIPAR`;
             overlayTotal.innerText = data.participantes.length;
 
             if (!data.ganador) {
@@ -86,7 +90,7 @@
                         item.className = 'ruleta-seccion-item';
                         
                         let anguloCentro = (index * gradosPorItem) + (gradosPorItem / 2);
-                        // Radio ajustado al nuevo tamaño de la rueda de 400px (-135px del centro)
+                        // Radio ajustado al nuevo tamaño de la rueda de 400px (-120px del centro)
                         item.style.transform = `rotate(${anguloCentro}deg) translate(0, -120px) rotate(-${anguloCentro}deg)`;
                         
                         item.innerText = user;
