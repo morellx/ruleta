@@ -43,11 +43,10 @@ client.on('message', (channel, tags, message, self) => {
     // --- COMANDOS DE CONTROL DESDE EL CHAT (Solo moderadores o el streamer) ---
     if (esMod) {
         if (msg.startsWith('-srt ')) {
-            // Ejemplo: !sorteo a  (Define la letra o palabra clave)
             let parts = message.trim().split(' ');
             if (parts.length > 1) {
                 estadoSorteo.palabraClave = parts[1].toLowerCase();
-                estadoSorteo.participantes = []; // Reinicia participantes al cambiar de palabra
+                estadoSorteo.participantes = [];
                 estadoSorteo.ganador = null;
                 estadoSorteo.oculto = false;
                 broadcast();
@@ -75,13 +74,9 @@ client.on('message', (channel, tags, message, self) => {
     }
 
     // --- VALIDACIÓN DE PARTICIPACIÓN ---
-    // Si el sorteo no está activo o la palabra está vacía, ignora
     if (estadoSorteo.oculto || !estadoSorteo.palabraClave) return;
 
-    // Validar si el mensaje coincide exactamente con la letra/palabra o si la contiene (según prefieras)
-    // Aquí validamos si el mensaje es exactamente igual a la palabra clave ingresada
     if (msg === estadoSorteo.palabraClave) {
-        // Filtrar según los permisos configurados en el panel
         let permitido = false;
         if (esRegular && estadoSorteo.incluirRegulares) permitido = true;
         if (esSub && estadoSorteo.incluirSubs) permitido = true;
@@ -89,7 +84,6 @@ client.on('message', (channel, tags, message, self) => {
         if (esMod && estadoSorteo.incluirMods) permitido = true;
 
         if (permitido) {
-            // Añadir a la lista si no está ya participando
             let nombreOriginal = tags['display-name'] || tags['username'];
             if (!estadoSorteo.participantes.some(p => p.toLowerCase() === username)) {
                 estadoSorteo.participantes.push(nombreOriginal);
@@ -101,6 +95,7 @@ client.on('message', (channel, tags, message, self) => {
 
 function broadcast() {
     const dataString = JSON.stringify(estadoSorteo);
+    console.log("-> Broadcast enviado a los clientes:", estadoSorteo); // Chivato para consola de Node
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(dataString);
@@ -109,11 +104,13 @@ function broadcast() {
 }
 
 wss.on('connection', (ws) => {
+    console.log("Nuevo cliente conectado por WebSocket.");
     ws.send(JSON.stringify(estadoSorteo));
 
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
+            console.log("<- Acción recibida del Panel de Control:", data);
 
             if (data.action === 'actualizarConfig') {
                 estadoSorteo.palabraClave = data.palabra.toLowerCase();
@@ -123,7 +120,7 @@ wss.on('connection', (ws) => {
                 estadoSorteo.incluirMods = data.mods;
                 estadoSorteo.participantes = [];
                 estadoSorteo.ganador = null;
-                estadoSorteo.oculto = false;
+                estadoSorteo.oculto = false; // Fuerza a mostrar el overlay
                 broadcast();
             } else if (data.action === 'mostrar') {
                 estadoSorteo.oculto = false;
@@ -143,7 +140,7 @@ wss.on('connection', (ws) => {
                 broadcast();
             }
         } catch (e) {
-            console.error(e);
+            console.error("Error procesando mensaje de WS:", e);
         }
     });
 });
