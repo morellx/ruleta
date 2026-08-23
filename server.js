@@ -157,7 +157,7 @@ wss.on('connection', (ws) => {
 
 // Puerto asignado dinámicamente por Railway
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`--- SORTEO CON RULETA INICIADO EN PUERTO ${PORT} ---`);
     console.log(`Canal conectado: ${canalTwitch || 'Ninguno'}`);
 });
