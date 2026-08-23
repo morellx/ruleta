@@ -36,8 +36,6 @@
     </div>
 
     <script>
-        const ws = new WebSocket('ws://localhost:3000');
-
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             document.getElementById('contador-participantes').innerText = data.participantes.length;
