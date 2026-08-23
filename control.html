@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control - Sorteo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="control-body">
+    <div class="control-container">
+        <h2>🎰 Panel de Control de Sorteo</h2>
+        
+        <label>Letra o Palabra Clave:</label>
+        <input type="text" id="palabra" placeholder="Ej: A">
+
+        <label style="margin-top: 16px;">Rangos permitidos para participar:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="regulares" checked> Espectadores Regulares</label>
+            <label><input type="checkbox" id="subs" checked> Suscriptores (Subs)</label>
+            <label><input type="checkbox" id="vips" checked> VIPs</label>
+            <label><input type="checkbox" id="mods" checked> Moderadores</label>
+        </div>
+
+        <button class="btn-iniciar" onclick="iniciarSorteo()">🚀 Iniciar / Reiniciar Sorteo</button>
+        
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <button class="btn-secundario" onclick="enviarAccion('mostrar')">👁️ -show</button>
+            <button class="btn-secundario" onclick="enviarAccion('ocultar')">🙈 -hide</button>
+        </div>
+
+        <button class="btn-ganador" onclick="enviarAccion('elegirGanador')">🏆 Sacar Ganador (-ganador)</button>
+
+        <div class="stats-box">
+            <p>Total Participantes: <span id="contador-participantes">0</span></p>
+            <p>Ganador Actual: <b id="texto-ganador" style="color: #ff3b5c;">Ninguno</b></p>
+        </div>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:3000');
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            document.getElementById('contador-participantes').innerText = data.participantes.length;
+            document.getElementById('texto-ganador').innerText = data.ganador ? data.ganador : "Ninguno";
+        };
+
+        function iniciarSorteo() {
+            const palabra = document.getElementById('palabra').value.trim();
+            if (!palabra) {
+                alert("Debes escribir una letra o palabra clave.");
+                return;
+            }
+
+            const regulares = document.getElementById('regulares').checked;
+            const subs = document.getElementById('subs').checked;
+            const vips = document.getElementById('vips').checked;
+            const mods = document.getElementById('mods').checked;
+
+            ws.send(JSON.stringify({
+                action: 'actualizarConfig',
+                palabra,
+                regulares,
+                subs,
+                vips,
+                mods
+            }));
+        }
+
+        function enviarAccion(action) {
+            ws.send(JSON.stringify({ action }));
+        }
+    </script>
+</body>
+</html>

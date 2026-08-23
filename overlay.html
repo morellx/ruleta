@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Overlay Ruleta Sorteo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="overlay-body">
+    <div id="contenedor-ruleta" class="ruleta-wrapper">
+        <div class="ruleta-header">🎲 NUEVO SORTEO 🎲</div>
+        <div id="info-palabra" class="palabra-badge">PALABRA: ...</div>
+
+        <!-- Contenedor general sin fondo y con la ruleta más grande -->
+        <div id="zona-ruleta" class="ruleta-contenedor-visual">
+            <div class="flecha-indicador"></div>
+            <div id="ruleta-giratoria" class="ruleta-circulo">
+                <div id="lista-participantes" class="ruleta-items-secciones">
+                    <span class="esperando-texto">ESPERANDO...</span>
+                </div>
+            </div>
+            <!-- Contador rápido en la esquina -->
+            <div class="contador-badge">PARTICIPANTES: <span id="overlay-total">0</span></div>
+        </div>
+
+        <!-- Popup central gigante para el ganador -->
+        <div id="popup-ganador-sorteo" class="popup-ganador-sorteo" style="display: none;">
+            <div class="popup-contenido">
+                <span class="popup-titulo">🏆 ¡GRAN GANADOR! 🏆</span>
+                <span id="ganador-nombre" class="ganador-nombre-texto">---</span>
+                <span class="popup-sub">¡FELICIDADES! 🎉</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:3000');
+        
+        // Paleta de colores vibrantes para las porciones
+        const ioneColores = ['#ff3b5c', '#9146ff', '#008144', '#00aeef', '#f7931e', '#ec008c', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const contenedor = document.getElementById('contenedor-ruleta');
+            const zonaRuleta = document.getElementById('zona-ruleta');
+            const lista = document.getElementById('lista-participantes');
+            const ruletaCirculo = document.getElementById('ruleta-giratoria');
+            const popup = document.getElementById('popup-ganador-sorteo');
+            const ganadorNombre = document.getElementById('ganador-nombre');
+            const palabraBadge = document.getElementById('info-palabra');
+            const overlayTotal = document.getElementById('overlay-total');
+
+            if (data.oculto) {
+                contenedor.classList.remove('visible');
+                return;
+            }
+
+            contenedor.classList.add('visible');
+                        palabraBadge.innerHTML = `ESCRIBE EN EL CHAT: <span style="color: #FFFFff; font-weight: 3000;">"${data.palabraClave}"</span> PARA PARTICIPAR`;
+            overlayTotal.innerText = data.participantes.length;
+
+            if (!data.ganador) {
+                ruletaCirculo.style.transition = "none";
+                ruletaCirculo.style.transform = "rotate(0deg)";
+                zonaRuleta.classList.remove('difuminado');
+                popup.style.display = 'none';
+
+                lista.innerHTML = "";
+                const total = data.participantes.length;
+
+                if (total === 0) {
+                    ruletaCirculo.style.background = "#18181b";
+                    lista.innerHTML = `<span class="esperando-texto">ESPERANDO PARTICIPANTES...</span>`;
+                } else {
+                    let gradosPorItem = 360 / total;
+                    let gradienteCss = "conic-gradient(";
+                    
+                    data.participantes.forEach((user, index) => {
+                        let colorActual = ioneColores[index % ioneColores.length];
+                        let inicio = index * gradosPorItem;
+                        let fin = (index + 1) * gradosPorItem;
+                        gradienteCss += `${colorActual} ${inicio}deg ${fin}deg${index === total - 1 ? '' : ', '}`;
+                    });
+                    gradienteCss += ")";
+                    ruletaCirculo.style.background = gradienteCss;
+
+                    data.participantes.forEach((user, index) => {
+                        let item = document.createElement('div');
+                        item.className = 'ruleta-seccion-item';
+                        
+                        let anguloCentro = (index * gradosPorItem) + (gradosPorItem / 2);
+                        // Radio ajustado al nuevo tamaño de la rueda de 400px (-135px del centro)
+                        item.style.transform = `rotate(${anguloCentro}deg) translate(0, -120px) rotate(-${anguloCentro}deg)`;
+                        
+                        item.innerText = user;
+                        lista.appendChild(item);
+                    });
+                }
+            } else {
+                ganadorNombre.innerText = data.ganador;
+
+                let indexGanador = data.participantes.indexOf(data.ganador);
+                let total = data.participantes.length;
+                let gradosPorItem = 360 / total;
+                let anguloCentroGanador = (indexGanador * gradosPorItem) + (gradosPorItem / 2);
+                let vueltasExtra = 360 * 6;
+                let gradosTotales = vueltasExtra + (360 - anguloCentroGanador);
+
+                ruletaCirculo.style.transition = "transform 4s cubic-bezier(0.15, 0.85, 0.15, 1)";
+                ruletaCirculo.style.transform = `rotate(${gradosTotales}deg)`;
+
+                setTimeout(() => {
+                    zonaRuleta.classList.add('difuminado');
+                    popup.style.display = 'flex';
+                }, 4000);
+            }
+        };
+    </script>
+</body>
+</html>

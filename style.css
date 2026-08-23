@@ -1,0 +1,343 @@
+/* --- ESTILOS GENERALES Y FUENTE FIJA --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0e0e10;
+    color: white;
+    overflow: hidden;
+}
+
+/* --- PANEL DE CONTROL --- */
+body.control-body {
+    background: #0e0e10;
+    padding: 0;
+    overflow-y: auto;
+}
+
+.control-container {
+    max-width: 500px;
+    background: #18181b;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #26262c;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    margin: 40px auto;
+}
+
+.control-container h2 {
+    margin-top: 0;
+    color: #ff3b5c;
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 1px solid #26262c;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+}
+
+.control-container label {
+    display: block;
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #a0a0ab;
+}
+
+.control-container input[type="text"] {
+    background: #1f1f23;
+    color: white;
+    border: 1px solid #2f2f35;
+    transition: border-color 0.15s ease;
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.control-container input[type="text"]:focus {
+    outline: none;
+    border-color: #ff3b5c;
+}
+
+.control-container button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    background: #ff3b5c;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.control-container button:hover {
+    background: #e02e4c;
+}
+
+.btn-secundario {
+    background: #2a2a30 !important;
+    color: white;
+}
+
+.btn-iniciar {
+    background: #008144 !important;
+    margin-top: 20px !important;
+}
+
+.btn-iniciar:hover {
+    background: #006b38 !important;
+}
+
+.checkbox-group {
+    background: #1f1f23;
+    border: 1px solid #2f2f35;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0 !important;
+    color: white !important;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #ff3b5c;
+    cursor: pointer;
+}
+
+.btn-ganador {
+    background: #9146ff !important;
+    margin-top: 10px !important;
+}
+
+.btn-ganador:hover {
+    background: #772ce8 !important;
+}
+
+.stats-box {
+    margin-top: 16px;
+    background: #1f1f23;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #2f2f35;
+    font-size: 13px;
+}
+
+.stats-box p {
+    margin-bottom: 4px;
+}
+
+
+/* --- OVERLAY: RULETA MÁS GRANDE --- */
+body.overlay-body {
+    background: transparent;
+    overflow: hidden;
+}
+
+.ruleta-wrapper {
+    width: 680px; /* Ampliado para la nueva ruleta */
+    background: rgba(18, 18, 20, 0.98);
+    padding: 24px;
+    border-radius: 12px;
+    border: 2px solid #26262c;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    display: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.ruleta-wrapper.visible {
+    display: block;
+}
+
+.ruleta-header {
+    text-align: center;
+    font-weight: 900;
+    font-size: 18px;
+    color: #ff3b5c;
+    margin-bottom: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.palabra-badge {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    background: #1f1f23;
+    border: 1px solid #2f2f35;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    color: #00ffaa;
+    text-transform: uppercase;
+}
+
+/* Contenedor ampliado para la ruleta grande */
+.ruleta-contenedor-visual {
+    position: relative;
+    width: 100%;
+    height: 460px; /* Ampliado verticalmente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: none;
+    overflow: hidden;
+    transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+.ruleta-contenedor-visual.difuminado {
+    filter: blur(6px) grayscale(40%);
+    opacity: 0.4;
+}
+
+.flecha-indicador {
+    position: absolute;
+    top: 4px;
+    z-index: 20;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 20px solid #ff3b5c;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+
+/* Ruleta grande (400px de diámetro) */
+.ruleta-circulo {
+    width: 400px;
+    height: 400px;
+    border: 6px solid #26262c;
+    border-radius: 50%;
+    background: #18181b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.ruleta-items-secciones {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+/* Tarjetas individuales de cada participante */
+.ruleta-seccion-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90px;
+    height: 24px;
+    margin-left: -45px;
+    margin-top: -12px;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    text-align: center;
+    line-height: 24px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contador-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 11px;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #a0a0ab;
+    font-weight: bold;
+}
+
+.esperando-texto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #71717a;
+    font-size: 12px;
+    font-style: italic;
+    white-space: nowrap;
+}
+
+/* Popup central ganador */
+.popup-ganador-sorteo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 30;
+    animation: fadeInPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popup-contenido {
+    background: #18181b;
+    border: 3px solid #00ffaa;
+    padding: 24px 32px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0, 255, 170, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 90%;
+}
+
+.popup-titulo {
+    font-size: 16px;
+    font-weight: 800;
+    color: #00ffaa;
+    letter-spacing: 1px;
+}
+
+.ganador-nombre-texto {
+    font-size: 26px;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    word-break: break-all;
+}
+
+.popup-sub {
+    font-size: 12px;
+    color: #a0a0ab;
+    font-weight: bold;
+}
+
+@keyframes fadeInPopup {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
